@@ -30,7 +30,9 @@ estilo.configure(
 frame_cabecalho = tk.Frame(
     janela,
     bd=1,
-    relief="solid"
+    relief="solid",
+    padx=10,
+    pady=10
 )
 
 frame_cabecalho.pack(
@@ -130,29 +132,32 @@ def tela_adicionar_receita():
         text="Descrição:"
     ).pack()
 
-    entrada_descricao = tk.Entry(janela_receita)
-    entrada_descricao.pack()
+    entrada_descricao = tk.Entry(janela_receita, width=35)
+    entrada_descricao.pack(pady=5)
 
     tk.Label(
         janela_receita,
         text="Valor:"
     ).pack()
 
-    entrada_valor = tk.Entry(janela_receita)
-    entrada_valor.pack()
+    entrada_valor = tk.Entry(janela_receita, width=35)
+    entrada_valor.pack(pady=5)
 
     tk.Label(
         janela_receita,
         text="Data:"
     ).pack()
 
-    entrada_data = tk.Entry(janela_receita)
-    entrada_data.pack()
+    entrada_data = tk.Entry(janela_receita, width=35)
+    entrada_data.pack(pady=5)
 
     botao_salvar = tk.Button(
         janela_receita,
         text="SALVAR",
-        command=salvar_receita
+        command=salvar_receita,
+        font=("Arial", 10, "bold"),
+        padx=10,
+        pady=5
     )
 
     botao_salvar.pack(pady=20)
@@ -225,37 +230,40 @@ def tela_adicionar_despesa():
             text="Descrição:"
         ).pack()
 
-    entrada_descricao = tk.Entry(janela_despesa)
-    entrada_descricao.pack()
+    entrada_descricao = tk.Entry(janela_despesa, width=35)
+    entrada_descricao.pack(pady=5)
 
     tk.Label(
         janela_despesa,
         text="Valor:"
     ).pack()
 
-    entrada_valor = tk.Entry(janela_despesa)
-    entrada_valor.pack()
+    entrada_valor = tk.Entry(janela_despesa, width=35)
+    entrada_valor.pack(pady=5)
 
     tk.Label(
         janela_despesa,
         text="Categoria:"
     ).pack()
 
-    entrada_categoria = tk.Entry(janela_despesa)
-    entrada_categoria.pack()
+    entrada_categoria = tk.Entry(janela_despesa, width=35)
+    entrada_categoria.pack(pady=5)
 
     tk.Label(
         janela_despesa,
         text="Data:"
     ).pack()
 
-    entrada_data = tk.Entry(janela_despesa)
-    entrada_data.pack()
+    entrada_data = tk.Entry(janela_despesa, width=35)
+    entrada_data.pack(pady=5)
 
     botao_salvar = tk.Button(
         janela_despesa,
         text="SALVAR",
-        command=salvar_despesa
+        command=salvar_despesa,
+        font=("Arial", 10, "bold"),
+            padx=10,
+            pady=5
     )
 
     botao_salvar.pack(pady=20)
@@ -585,14 +593,14 @@ atualizar_saldo()
 frame_adicionar = tk.Frame(janela)
 
 frame_adicionar.pack(
-    pady=10,
+    pady=15,
     fill=tk.X
 )
 
 frame_acoes = tk.Frame(janela)
 
 frame_acoes.pack(
-    pady=10,
+    pady=15,
     fill=tk.X
 )
 
@@ -635,7 +643,10 @@ botao_despesa.pack(
 botao_resumo = tk.Button(
     frame_botoes_acoes,
     text="Ver Resumo",
-    command=mostrar_resumo
+    command=mostrar_resumo,
+    font=("Arial", 10, "bold"),
+    padx=10,
+    pady=5
 )
 
 botao_resumo.pack(
@@ -679,8 +690,8 @@ def editar_selecionado():
         text="Descricao:"
     ).pack()
 
-    entrada_descricao = tk.Entry(janela_editar)
-    entrada_descricao.pack()
+    entrada_descricao = tk.Entry(janela_editar, width=35)
+    entrada_descricao.pack(pady=5)
 
     entrada_descricao.insert(
         0,
@@ -692,8 +703,8 @@ def editar_selecionado():
         text="Valor:"
     ).pack()
 
-    entrada_valor = tk.Entry(janela_editar)
-    entrada_valor.pack()
+    entrada_valor = tk.Entry(janela_editar, width=35)
+    entrada_valor.pack(pady=5)
 
     entrada_valor.insert(
         0,
@@ -705,8 +716,8 @@ def editar_selecionado():
         text="Data:"
     ).pack()
 
-    entrada_data = tk.Entry(janela_editar)
-    entrada_data.pack()
+    entrada_data = tk.Entry(janela_editar, width=35)
+    entrada_data.pack(pady=5)
 
     entrada_data.insert(
         0,
@@ -720,8 +731,8 @@ def editar_selecionado():
             text="Categoria:"
         ).pack()
 
-        entrada_categoria = tk.Entry(janela_editar)
-        entrada_categoria.pack()
+        entrada_categoria = tk.Entry(janela_editar, width=35)
+        entrada_categoria.pack(pady=5)
 
         entrada_categoria.insert(
             0,
@@ -790,7 +801,10 @@ def editar_selecionado():
     botao_salvar = tk.Button(
         janela_editar,
         text="SALVAR",
-        command=salvar_edicao
+        command=salvar_edicao,
+        font=("Arial", 10, "bold"),
+            padx=10,
+            pady=5
     )
 
     botao_salvar.pack(pady=20)
@@ -798,7 +812,10 @@ def editar_selecionado():
 botao_editar = tk.Button(
     frame_botoes_acoes,
     text="Editar",
-    command=editar_selecionado
+    command=editar_selecionado,
+    font=("Arial", 10, "bold"),
+    padx=10,
+    pady=5
 )
 
 botao_editar.pack(
@@ -850,7 +867,10 @@ def excluir_selecionado():
 botao_excluir = tk.Button(
     frame_botoes_acoes,
     text="Excluir",
-    command=excluir_selecionado
+    command=excluir_selecionado,
+    font=("Arial", 10, "bold"),
+    padx=10,
+    pady=5
 )
 
 botao_excluir.pack(
