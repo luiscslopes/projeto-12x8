@@ -1,20 +1,26 @@
 import tkinter as tk
-
 from tkinter import messagebox, ttk
+from datetime import datetime
 
 import funcoes
 
-from datetime import datetime
+# ==================================================================================
+# CONFIGURAÇÃO INICIAL
+# ==================================================================================
 
-janela = tk.Tk() #cria a janela do programa
+janela = tk.Tk()  # cria a janela do programa
 
 receitas, despesas = funcoes.carregar_dados()
 
-janela.title("Projeto 12x8") #define o que aparecerá no topo da janela
+janela.title("Projeto 12x8")  # define o que aparecerá no topo da janela
 
-janela.geometry("600x500") #define largura e altura = 600px lar x 500 px de altura
+janela.geometry("600x500")  # define largura e altura = 600px lar x 500 px de altura
 
 janela.minsize(600, 500)
+
+# =================================================================================
+# CONFIGURAÇÃO VISUAL
+# =================================================================================
 
 estilo = ttk.Style()
 estilo.configure(
@@ -22,7 +28,7 @@ estilo.configure(
     rowheight=28
 )
 
-estilo.configure( 
+estilo.configure(
     "Treeview.Heading",
     font=("Arial", 10, "bold")
 )
@@ -46,7 +52,15 @@ titulo = tk.Label(
     font=("Arial", 26, "bold")
 )  # mantém a janela aberta e aguardando interações / #mostrar texto
 
-titulo.pack(pady=30) #pack -> colocar elementos na janela
+titulo.pack(pady=30)  # pack -> colocar elementos na janela
+
+subtitulo = tk.Label(
+    frame_cabecalho,
+    text="Controle financeiro pessoal",
+    font=("Arial", 12)
+)
+
+subtitulo.pack(pady=(0, 10))
 
 saldo = tk.Label(
     frame_cabecalho,
@@ -66,12 +80,34 @@ informacoes.pack(
     pady=(10, 5)
 )
 
+# ===================================================================================
+#  VALIDAÇÕES
+# ===================================================================================
+
 def validar_data(data):
     try:
         datetime.strptime(data, "%d/%m/%Y")
         return True
     except ValueError:
         return False
+
+def validar_valor(valor_texto):
+    try:
+        valor = float(valor_texto)
+    except ValueError:
+        return None
+
+    return valor if valor > 0 else None
+
+def validar_descricao(descricao):
+    return bool(descricao.strip())
+
+def validar_categoria(categoria):
+    return bool(categoria.strip())
+
+# ================================================================================
+# ADIÇÃO DE MOVIMENTAÇÃO
+# ================================================================================
 
 def tela_adicionar_receita():
     janela_receita = tk.Toplevel(janela)
@@ -89,30 +125,24 @@ def tela_adicionar_receita():
                 "Data inválida",
                 "Digite uma data válida no formato DD/MM/AAAA."
             )
+            return
 
-        if not descricao:
+        if not validar_descricao(descricao):
             messagebox.showerror(
                 "Descrição inválida",
                 "A descrição não pode ficar vazia."
             )
             return
 
-        try:
-            valor = float(valor_texto)
-        except ValueError:
+        valor = validar_valor(valor_texto)
+
+        if valor is None:
             messagebox.showerror(
                 "Valor inválido",
-                "Digite um valor númerico válido."
+                "Digite um valor numérico maior que zero."
             )
             return
 
-        if valor <=0:
-            messagebox.showerror(
-                "Valor inválido",
-                "O valor deve ser maior que zero."
-            )
-            return
-    
         receita = {
             "descricao": descricao,
             "valor": valor,
@@ -179,34 +209,28 @@ def tela_adicionar_despesa():
                 "Data inválida",
                 "Digite uma data válida no formato DD/MM/AAAA."
             )
+            return
 
-        if not descricao:
+        if not validar_descricao(descricao):
             messagebox.showerror(
                 "Descrição inválida",
                 "A descrição não pode ficar vazia."
             )
             return
 
-        if not categoria:
+        if not validar_categoria(categoria):
             messagebox.showerror(
                 "Categoria inválida",
                 "A categoria não pode ficar vazia."
             )
             return
 
-        try:
-            valor = float(valor_texto)
-        except ValueError:
-            messagebox.showerror(
-                "Valor inválido",
-                "Digite um valor númerico válido."
-            )
-            return
+        valor = validar_valor(valor_texto)
 
-        if valor <=0:
+        if valor is None:
             messagebox.showerror(
                 "Valor inválido",
-                "O valor deve ser maior que zero."
+                "Digite um valor numérico maior que zero."
             )
             return
 
@@ -226,9 +250,9 @@ def tela_adicionar_despesa():
         janela_despesa.destroy()
 
     tk.Label(
-            janela_despesa,
-            text="Descrição:"
-        ).pack()
+        janela_despesa,
+        text="Descrição:"
+    ).pack()
 
     entrada_descricao = tk.Entry(janela_despesa, width=35)
     entrada_descricao.pack(pady=5)
@@ -262,11 +286,15 @@ def tela_adicionar_despesa():
         text="SALVAR",
         command=salvar_despesa,
         font=("Arial", 10, "bold"),
-            padx=10,
-            pady=5
+        padx=10,
+        pady=5
     )
 
     botao_salvar.pack(pady=20)
+
+# ================================================================================
+# TABELA DE MOVIMENTAÇÕES
+# ================================================================================
 
 frame_tabela = tk.Frame(janela)
 
@@ -300,7 +328,7 @@ tabela_movimentacoes.heading(
 )
 
 tabela_movimentacoes.heading(
-    "descricao", 
+    "descricao",
     text="Descrição"
 )
 
@@ -361,25 +389,30 @@ scrollbar.grid(
 
 movimentacoes = []
 
+# ================================================================================
+# MOVIMENTAÇÕES
+# ================================================================================
+
 def obter_movimentacoes_ordenadas():
-    movimentacoes = []
+    lista_movimentacoes = []
 
     for indice, receita in enumerate(receitas):
-        movimentacoes.append(("Receita", indice, receita))
+        lista_movimentacoes.append(("Receita", indice, receita))
 
     for indice, despesa in enumerate(despesas):
-        movimentacoes.append(("Despesa", indice, despesa))
+        lista_movimentacoes.append(("Despesa", indice, despesa))
 
-    movimentacoes.sort(
-        key=lambda item: datetime.strptime(
-            item[2]["data"],
+    lista_movimentacoes.sort(
+        key=lambda movimentacao: datetime.strptime(
+            movimentacao[2]["data"],
             "%d/%m/%Y"
         )
     )
 
-    return movimentacoes
+    return lista_movimentacoes
 
 def atualizar_lista():
+
     movimentacoes.clear()
 
     for item in tabela_movimentacoes.get_children():
@@ -387,7 +420,7 @@ def atualizar_lista():
 
     movimentacoes_ordenadas = obter_movimentacoes_ordenadas()
 
-    for tipo, indice, item in movimentacoes_ordenadas:
+    for tipo, indice, movimentacao in movimentacoes_ordenadas:
 
         if tipo == "Receita":
             movimentacoes.append(("receita", indice))
@@ -400,9 +433,9 @@ def atualizar_lista():
             tk.END,
             values=(
                 tipo,
-                item["descricao"],
-                funcoes.formatar_moeda(item["valor"]),
-                item["data"]
+                movimentacao["descricao"],
+                funcoes.formatar_moeda(movimentacao["valor"]),
+                movimentacao["data"]
             )
         )
 
@@ -419,6 +452,10 @@ def atualizar_saldo():
         text=f"Saldo: {funcoes.formatar_moeda(saldo_atual)}"
     )
 
+# ================================================================================
+# RESUMO FINANCEIRO
+# ================================================================================
+
 def mostrar_resumo():
     total_receitas = funcoes.calcular_total(receitas)
     total_despesas = funcoes.calcular_total(despesas)
@@ -429,8 +466,14 @@ def mostrar_resumo():
     )
 
     if despesas:
-        maior_despesa = max(despesas, key=lambda despesa: despesa["valor"])
-        menor_despesa = min(despesas, key=lambda despesa: despesa["valor"])
+        maior_despesa = max(
+            despesas,
+            key=lambda despesa: despesa["valor"]
+        )
+        menor_despesa = min(
+            despesas,
+            key=lambda despesa: despesa["valor"]
+        )
     else:
         maior_despesa = None
         menor_despesa = None
@@ -445,9 +488,9 @@ def mostrar_resumo():
 
         totais_categorias[categoria] += despesa["valor"]
 
-    # ======================================
+    # ================================================================================
     # JANELA
-    # ======================================
+    # ================================================================================
 
     janela_resumo = tk.Toplevel(janela)
 
@@ -455,9 +498,9 @@ def mostrar_resumo():
     janela_resumo.geometry("520x550")
     janela_resumo.resizable(False, False)
 
-    # ======================================
+    # ================================================================================
     # TÍTULO
-    # ======================================
+    # ================================================================================
 
     tk.Label(
         janela_resumo,
@@ -465,9 +508,9 @@ def mostrar_resumo():
         font=("Arial", 22, "bold")
     ).pack(pady=(25, 20))
 
-    # ======================================
+    # ================================================================================
     # RESUMO DOS VALORES
-    # ======================================
+    # ================================================================================
 
     quadro_valores = tk.Frame(janela_resumo)
     quadro_valores.pack(fill="x", padx=40)
@@ -508,18 +551,17 @@ def mostrar_resumo():
         font=("Arial", 18, "bold")
     ).pack(pady=(0, 15))
 
-    # ======================================
+    # ================================================================================
     # SEPARADOR
-    # ======================================
-
+    # ================================================================================
     tk.Frame(
         janela_resumo,
         height=2
     ).pack(fill="x", padx=40, pady=10)
 
-    # ======================================
+    # ================================================================================
     # MAIOR E MENOR DESPESA
-    # ======================================
+    # ================================================================================
 
     tk.Label(
         janela_resumo,
@@ -553,24 +595,24 @@ def mostrar_resumo():
             font=("Arial", 12)
         ).pack(pady=5)
 
-    # ========================================
+    # ================================================================================
     # SEPARADOR
-    # ========================================
+    # ================================================================================
 
     tk.Frame(
         janela_resumo,
         height=2
     ).pack(fill="x", padx=40, pady=15)
 
-    # ========================================
+    # ================================================================================
     # CATEGORIAS
-    # ========================================
+    # ================================================================================
 
     tk.Label(
         janela_resumo,
         text="DESPESAS POR CATEGORIA",
         font=("Arial", 15, "bold")
-    ).pack(pady=(0,10))
+    ).pack(pady=(0, 10))
 
     if totais_categorias:
         for categoria, total in totais_categorias.items():
@@ -589,6 +631,10 @@ def mostrar_resumo():
 
 atualizar_lista()
 atualizar_saldo()
+
+# ================================================================================
+# BOTÕES E AÇÕES
+# ================================================================================
 
 frame_adicionar = tk.Frame(janela)
 
@@ -617,8 +663,8 @@ botao_receita = tk.Button(
     text="Adicionar Receita",
     command=tela_adicionar_receita,
     font=("Arial", 10, "bold"),
-        padx=10,
-        pady=5
+    padx=10,
+    pady=5
 )
 
 botao_receita.pack(
@@ -654,6 +700,10 @@ botao_resumo.pack(
     padx=10
 )
 
+# =================================================================================
+# EDIÇÃO
+# =================================================================================
+
 def editar_selecionado():
     selecionado = tabela_movimentacoes.selection()
 
@@ -673,9 +723,9 @@ def editar_selecionado():
     tipo, indice = movimentacoes[indice_lista]
 
     if tipo == "receita":
-        item = receitas[indice]
+        movimentacao = receitas[indice]
     else:
-        item = despesas[indice]
+        movimentacao = despesas[indice]
 
     janela_editar = tk.Toplevel(janela)
 
@@ -687,7 +737,7 @@ def editar_selecionado():
 
     tk.Label(
         janela_editar,
-        text="Descricao:"
+        text="Descrição:"
     ).pack()
 
     entrada_descricao = tk.Entry(janela_editar, width=35)
@@ -695,7 +745,7 @@ def editar_selecionado():
 
     entrada_descricao.insert(
         0,
-        item["descricao"]
+        movimentacao["descricao"]
     )
 
     tk.Label(
@@ -708,7 +758,7 @@ def editar_selecionado():
 
     entrada_valor.insert(
         0,
-        str(item["valor"])
+        str(movimentacao["valor"])
     )
 
     tk.Label(
@@ -721,7 +771,7 @@ def editar_selecionado():
 
     entrada_data.insert(
         0,
-        item["data"]
+        movimentacao["data"]
     )
 
     if tipo == "despesa":
@@ -736,7 +786,7 @@ def editar_selecionado():
 
         entrada_categoria.insert(
             0,
-            item["categoria"]
+            movimentacao["categoria"]
         )
 
     def salvar_edicao():
@@ -749,47 +799,40 @@ def editar_selecionado():
                 "Data inválida",
                 "Digite uma data válida no formato DD/MM/AAAA."
             )
+            return
 
-        if not nova_descricao:
+        if not validar_descricao(nova_descricao):
             messagebox.showerror(
                 "Descrição inválida",
                 "A descrição não pode ficar vazia."
             )
             return
 
-        try:
-            valor = float(novo_valor)
-        except ValueError:
-            messagebox.showerror(
-                "Valor inválido",
-                "Digite um valor númerico válido."
-            )
-            return
+        valor = validar_valor(novo_valor)
 
-        if valor <= 0:
+        if valor is None:
             messagebox.showerror(
                 "Valor inválido",
-                "O valor deve ser maior que zero."
+                "Digite um valor numérico maior que zero."
             )
             return
 
         if tipo == "despesa":
             nova_categoria = entrada_categoria.get().strip()
 
-            if not nova_categoria:
+            if not validar_categoria(nova_categoria):
                 messagebox.showerror(
                     "Categoria inválida",
                     "A categoria não pode ficar vazia."
                 )
                 return
 
-        item["descricao"] = nova_descricao
-        item["valor"] = valor
-        item["data"] = nova_data
+        movimentacao["descricao"] = nova_descricao
+        movimentacao["valor"] = valor
+        movimentacao["data"] = nova_data
 
         if tipo == "despesa":
-            item["categoria"] = nova_categoria
-
+            movimentacao["categoria"] = nova_categoria
 
         funcoes.salvar_dados(receitas, despesas)
 
@@ -803,8 +846,8 @@ def editar_selecionado():
         text="SALVAR",
         command=salvar_edicao,
         font=("Arial", 10, "bold"),
-            padx=10,
-            pady=5
+        padx=10,
+        pady=5
     )
 
     botao_salvar.pack(pady=20)
@@ -822,6 +865,10 @@ botao_editar.pack(
     side=tk.LEFT,
     padx=10
 )
+
+# =================================================================================
+# EXCLUSÃO
+# =================================================================================
 
 def excluir_selecionado():
     selecionado = tabela_movimentacoes.selection()
@@ -842,13 +889,13 @@ def excluir_selecionado():
     tipo, indice = movimentacoes[indice_lista]
 
     if tipo == "receita":
-        item = receitas[indice]
+        movimentacao = receitas[indice]
     else:
-        item = despesas[indice]
+        movimentacao = despesas[indice]
 
     confirmacao = messagebox.askyesno(
         "Confirmar exclusão",
-        f"Deseja excluir:\n\n{item['descricao']}?"
+        f"Deseja excluir:\n\n{movimentacao['descricao']}?"
     )
 
     if not confirmacao:
@@ -856,7 +903,7 @@ def excluir_selecionado():
 
     if tipo == "receita":
         del receitas[indice]
-    else: 
+    else:
         del despesas[indice]
 
     funcoes.salvar_dados(receitas, despesas)
