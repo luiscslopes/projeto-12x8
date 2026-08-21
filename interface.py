@@ -880,10 +880,10 @@ def excluir_selecionado():
         )
         return
 
-    item_selecionado = selecionado[0]
+    id_selecionado = selecionado[0]
 
     indice_lista = tabela_movimentacoes.index(
-        item_selecionado
+        id_selecionado
     )
 
     tipo, indice = movimentacoes[indice_lista]
