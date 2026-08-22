@@ -448,8 +448,10 @@ def atualizar_saldo():
         total_despesas
     )
 
+    saldo_formatado = funcoes.formatar_moeda(saldo_atual)
+
     saldo.config(
-        text=f"Saldo: {funcoes.formatar_moeda(saldo_atual)}"
+        text=f"Saldo: {saldo_formatado}"
     )
 
 # ================================================================================
@@ -718,6 +720,17 @@ def obter_movimentacao_selecionada():
 
     return movimentacoes[indice_lista]
 
+def obter_dados_movimentacao(selecionado):
+
+    tipo, indice = selecionado
+
+    if tipo == "receita":
+        movimentacao = receitas[indice]
+    else:
+        movimentacao = despesas[indice]
+
+    return tipo, indice, movimentacao
+
 def editar_selecionado():
     selecionado = obter_movimentacao_selecionada()
 
@@ -728,12 +741,7 @@ def editar_selecionado():
         )
         return
 
-    tipo, indice = selecionado
-
-    if tipo == "receita":
-        movimentacao = receitas[indice]
-    else:
-        movimentacao = despesas[indice]
+    tipo, indice, movimentacao = obter_dados_movimentacao(selecionado)
 
     janela_editar = tk.Toplevel(janela)
 
@@ -888,12 +896,7 @@ def excluir_selecionado():
         )
         return
 
-    tipo, indice = selecionado
-
-    if tipo == "receita":
-        movimentacao = receitas[indice]
-    else:
-        movimentacao = despesas[indice]
+    tipo, indice, movimentacao = obter_dados_movimentacao(selecionado)
 
     confirmacao = messagebox.askyesno(
         "Confirmar exclusão",
