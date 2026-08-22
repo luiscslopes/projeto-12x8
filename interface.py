@@ -701,18 +701,14 @@ botao_resumo.pack(
 )
 
 # =================================================================================
-# EDIÇÃO
+# AÇÕES DE MOVIMENTAÇÕES
 # =================================================================================
 
-def editar_selecionado():
+def obter_movimentacao_selecionada():
     selecionado = tabela_movimentacoes.selection()
 
     if not selecionado:
-        messagebox.showwarning(
-            "Atenção!",
-            "Selecione uma movimentação para editar."
-        )
-        return
+        return None
 
     id_selecionado = selecionado[0]
 
@@ -720,7 +716,19 @@ def editar_selecionado():
         id_selecionado
     )
 
-    tipo, indice = movimentacoes[indice_lista]
+    return movimentacoes[indice_lista]
+
+def editar_selecionado():
+    selecionado = obter_movimentacao_selecionada()
+
+    if selecionado is None:
+        messagebox.showwarning(
+            "Atenção!",
+            "Selecione uma movimentação para editar."
+        )
+        return
+
+    tipo, indice = selecionado
 
     if tipo == "receita":
         movimentacao = receitas[indice]
@@ -871,22 +879,16 @@ botao_editar.pack(
 # =================================================================================
 
 def excluir_selecionado():
-    selecionado = tabela_movimentacoes.selection()
+    selecionado = obter_movimentacao_selecionada()
 
-    if not selecionado:
+    if selecionado is None:
         messagebox.showwarning(
             "Atenção!",
             "Selecione uma movimentação para excluir."
         )
         return
 
-    id_selecionado = selecionado[0]
-
-    indice_lista = tabela_movimentacoes.index(
-        id_selecionado
-    )
-
-    tipo, indice = movimentacoes[indice_lista]
+    tipo, indice = selecionado
 
     if tipo == "receita":
         movimentacao = receitas[indice]
